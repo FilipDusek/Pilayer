@@ -1,0 +1,10 @@
+.player {
+  background-color: blue; }
+
+.player .btn {
+  background-color: #000; }
+
+.player-playlist ul li {
+  cursor: pointer; }
+  .player-playlist ul li.active {
+    font-weight: bold; }

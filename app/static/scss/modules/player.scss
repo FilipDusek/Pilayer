@@ -1,0 +1,9 @@
+.player {
+	background-color: blue;
+}
+$var: #000;
+.player { 
+	.btn {
+		background-color: $var;
+	}
+}

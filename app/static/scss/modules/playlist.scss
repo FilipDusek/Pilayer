@@ -1,0 +1,10 @@
+.player-playlist{
+	ul{
+		li{
+			cursor: pointer;
+			&.active{
+				font-weight: bold;
+			}
+		}
+	}
+}

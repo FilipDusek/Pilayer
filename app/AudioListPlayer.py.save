@@ -1,0 +1,114 @@
+from vlc import *
+import time
+import random
+import datetime
+class AudioListPlayer():
+	instance = Instance()
+	
+	def _log(self, message):
+		if self.debug: 
+			timestamp = datetime.datetime.now().strftime('%H:%M:%S')
+			print("\033[92m" + timestamp + " AudioListPlayer: \033[0m" + message)
+
+	def handler_media_end_reached(self, arg):
+		self._log("MediaPlayerEndReached event")
+
+		if self.next():
+			self.player.play()
+		else:
+			self.playlist_end_reached = True
+			self._log("Reached end of playlist")
+
+	def __init__(self, media, default_volume = 100, debug = False):
+		self.debug = debug
+
+		self.playlist_position = 0
+		self.playlist = media
+		self.playlist_end_reached = False
+		self.volume = default_volume
+
+		self._make_new_player()
+
+		self._log("AudioListPlayer initialized")
+
+
+	def play(self):
+		if self.player.get_media() is None:
+			media = self.instance.media_new(self.playlist[self.playlist_position])
+			self.player.set_media(media)
+		self.player.play()
+
+	def pause(self):
+		self.player.pause()
+
+	def _make_new_player(self):
+		if hasattr(self, 'player'):
+			self.player.release()
+			self._log("Stopped last instance of Player")
+
+		self.player = self.instance.media_player_new()
+		self._log("New Player instance created")
+
+		self.set_volume(self.volume)
+		self.event_manager = self.player.event_manager()
+		self.event_manager.event_attach(EventType.MediaPlayerEndReached, self.handler_media_end_reached)
+		self._log("MediaPlayerEndReached event attached")
+
+	def set_volume(self, i_volume):
+		self.volume = i_volume
+		self.player.audio_set_volume(i_volume)
+		self._log("Volume set to " + str(i_volume))
+
+	def get_volume(self):
+		return self.player.audio_get_volume()
+
+	def set_position(self, f_pos):
+		self.player.set_position(f_pos)
+a		self._log("Position set to " + f_pos)
+
+	def get_position(self):
+		return self.player.get_position()
+
+	def next(self):
+		self._log("Moving to next audio file")
+
+		self.playlist_position += 1
+		was_playing = self.is_playing()
+		if (self.playlist_position < len(self.playlist)):
+			self._make_new_player()
+			media = self.instance.media_new(self.playlist[self.playlist_position])
+			self.player.set_media(media)
+			self._log("\n\tNext audio file loaded.\n\tFile has index " + 
+				str(self.playlist_position) + "\n\tFile location is \"" + 
+				self.playlist[self.playlist_position] + "\"\n")
+
+			if was_playing:
+				self.play()
+			return True
+
+		self._log("There isn't any next file with index " + str(self.playlist_position))
+		return False
+
+	def is_playing(self):
+		return self.player.is_playing()
+
+	def insert_media(self, media):
+		pass
+
+	def add_media(self, media):
+		pass
+
+	def remove_media_at(self, index):
+		pass
+
+lplr = AudioListPlayer(["/mnt/nfs/sounds/a.mp3", 
+						"/mnt/nfs/sounds/asharp.mp3", 
+						"/mnt/nfs/sounds/b.mp3", 
+						"/mnt/nfs/sounds/c.mp3", 
+						"/mnt/nfs/sounds/csharp.mp3", "/mnt/nfs/sounds/eben.mp3"]*10, 100, True)
+lplr.play()
+i = 0
+while not lplr.playlist_end_reached:
+	i += 1
+	time.sleep(0.5)
+	lplr.next()
