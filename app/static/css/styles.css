@@ -1,10 +1,230 @@
-.player {
-  background-color: blue; }
+.player-container {
+  position: absolute;
+  top: 70%;
+  width: 100%; }
 
-.player .btn {
-  background-color: #000; }
+.player-action-toggle-play.is-playing span:after {
+  content: "\e073"; }
 
-.player-playlist ul li {
-  cursor: pointer; }
-  .player-playlist ul li.active {
-    font-weight: bold; }
+.player-action-toggle-play.is-paused span:after {
+  content: "\e072"; }
+
+.player-progress-info {
+  position: relative;
+  height: 20px; }
+  .player-progress-info .player-binding-played {
+    position: absolute;
+    left: 5px; }
+  .player-progress-info .player-binding-length {
+    position: absolute;
+    right: 5px; }
+
+.player-track-info {
+  text-align: center; }
+  .player-track-info .player-track-info-main {
+    font-weight: bold;
+    font-size: 20px; }
+  .player-track-info .player-track-info-extra {
+    font-size: 12px; }
+
+.player-controls-outer {
+  text-align: center;
+  position: relative; }
+  .player-controls-outer .player-controls-inner {
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 15px;
+    width: 80%;
+    max-width: 300px;
+    position: relative;
+    display: inline-block; }
+  .player-controls-outer .player-action {
+    position: relative;
+    height: 53px;
+    border: none;
+    background-color: transparent;
+    font-size: 40px; }
+    .player-controls-outer .player-action:focus {
+      outline: none; }
+    .player-controls-outer .player-action.player-action-prev, .player-controls-outer .player-action.player-action-next {
+      font-size: 20px;
+      position: absolute; }
+    .player-controls-outer .player-action.player-action-prev {
+      left: 45px; }
+    .player-controls-outer .player-action.player-action-next {
+      right: 45px; }
+    .player-controls-outer .player-action.player-action-search-toggle {
+      position: absolute;
+      right: 5%;
+      top: 25%; }
+
+.player-element-progress.ui-slider {
+  margin-top: -5px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 0px;
+  height: 5px;
+  border-right: 5px solid transparent;
+  margin-bottom: 5px; }
+  .player-element-progress.ui-slider .ui-slider-range {
+    background: #00BCD4;
+    border-radius: 0px; }
+  .player-element-progress.ui-slider .ui-slider-handle {
+    height: 15px;
+    width: 5px;
+    color: black;
+    border: none;
+    border-radius: 0px;
+    margin-left: 0px;
+    background-color: #EEEEEE;
+    -webkit-box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.55);
+    -moz-box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.55);
+    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.55); }
+    .player-element-progress.ui-slider .ui-slider-handle:focus {
+      outline: none; }
+
+.player-volume-cont {
+  text-align: center;
+  padding-left: 100px;
+  padding-right: 100px; }
+  .player-volume-cont .player-binding-volume-status {
+    font-size: 30px;
+    padding-bottom: 20px; }
+    .player-volume-cont .player-binding-volume-status.volume-off:before {
+      content: "\e036"; }
+    .player-volume-cont .player-binding-volume-status.volume-up:before {
+      content: "\e038"; }
+  .player-volume-cont .player-element-volume {
+    border: none;
+    border-radius: 0px;
+    background-color: rgba(0, 0, 0, 0.2);
+    height: 7px;
+    margin-bottom: 25px; }
+    .player-volume-cont .player-element-volume .ui-slider-range {
+      border-radius: 0px;
+      background-color: rgba(0, 0, 0, 0.4); }
+    .player-volume-cont .player-element-volume .ui-slider-handle {
+      display: none; }
+
+.player-element-queue {
+  text-align: center; }
+  .player-element-queue ul {
+    text-align: left;
+    list-style-type: none;
+    padding-left: 0px; }
+    .player-element-queue ul li {
+      padding-left: 60px;
+      min-height: 45px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      position: relative; }
+      .player-element-queue ul li:first-of-type {
+        border-top: 1px solid rgba(0, 0, 0, 0.5); }
+      .player-element-queue ul li.active {
+        background-color: rgba(0, 0, 0, 0.03);
+        font-weight: bold; }
+        .player-element-queue ul li.active:before {
+          position: absolute;
+          left: 25px;
+          top: 12px;
+          content: "\e072";
+          font-family: 'Glyphicons Halflings'; }
+      .player-element-queue ul li .queue-song-title {
+        font-size: 16px; }
+      .player-element-queue ul li .queue-song-artist {
+        font-size: 12px; }
+
+.player-art-container {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden; }
+  .player-art-container .player-binding-art {
+    width: 100%;
+    height: 70%;
+    background-position: center center;
+    background-image: url("/static/img/albumart.jpg");
+    background-size: contain;
+    background-repeat: no-repeat; }
+    .player-art-container .player-binding-art.blurred-art {
+      background-size: cover;
+      position: absolute;
+      z-index: -1;
+      filter: blur(35px);
+      -o-filter: blur(35px);
+      -ms-filter: blur(35px);
+      -moz-filter: blur(35px);
+      -webkit-filter: blur(35px);
+      width: 120%;
+      height: 82%;
+      margin-left: -70px;
+      margin-top: -70px; }
+
+.search-outter {
+  width: 100%;
+  padding-bottom: 10px; }
+  .search-outter .search-inner {
+    position: relative;
+    text-align: center;
+    z-index: 5;
+    background-color: white; }
+    .search-outter .search-inner .player-action-search-input {
+      margin-bottom: 10px;
+      margin-top: 10px;
+      height: 40px;
+      width: 90%;
+      max-width: 300px;
+      outline: none;
+      font-size: 20px;
+      padding-left: 10px; }
+    .search-outter .search-inner ul {
+      text-align: left;
+      list-style-type: none;
+      padding-left: 0px;
+      position: relative; }
+      .search-outter .search-inner ul li {
+        padding-left: 30px;
+        min-height: 45px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        position: relative; }
+        .search-outter .search-inner ul li:first-of-type {
+          border-top: 1px solid rgba(0, 0, 0, 0.5); }
+        .search-outter .search-inner ul li.active {
+          background-color: rgba(0, 0, 0, 0.03);
+          font-weight: bold; }
+          .search-outter .search-inner ul li.active:before {
+            position: absolute;
+            left: 25px;
+            top: 12px;
+            content: "\e072";
+            font-family: 'Glyphicons Halflings'; }
+        .search-outter .search-inner ul li .pull-right {
+          position: absolute;
+          top: 10px;
+          right: 30px;
+          font-size: 30px; }
+        .search-outter .search-inner ul li:hover .pull-right {
+          color: green; }
+        .search-outter .search-inner ul li .results-song-title {
+          font-size: 16px; }
+        .search-outter .search-inner ul li .results-song-artist {
+          font-size: 12px; }
+
+.toast-msg {
+  width: 200px;
+  position: fixed;
+  left: 50%;
+  margin-left: -100px;
+  bottom: 10px;
+  background-color: rgba(0, 0, 0, 0.65);
+  color: #F0F0F0;
+  font-size: 20px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.35);
+  border-radius: 2px; }

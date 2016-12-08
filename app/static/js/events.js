@@ -1,69 +1,64 @@
+/* Functions specific to current template */
 $( document ).ready(function() {
-	alplr = new AudioListPlayer();
-
-	$(".player-action-play").click(function(){
-		alplr.play();
+	$(".player-action-search-toggle").click(function(){
+		var search_focus = false;
+		if($(".player-action-search-input").is(":hidden"))
+		{
+			show_search = true;
+		} else {
+			$(".player-element-queue").show();
+			$(".player-element-search-results").html("");
+		}
+		$(".player-action-search-input").slideToggle(100, function() {
+        	if (show_search){
+        		$(".player-action-search-input").focus();
+				$(this)[0].scrollIntoView();
+			} else {
+	        	$(".player-action-search-input").val("");
+			}
+    	});
 	});
 
-	$(".player-action-pause").click(function(){
-		alplr.pause();
+	alplr.on_pay_fail.addEventListener(function(lib){
+		show_toast(3500, "Damn, you don't have any credits and there is nothing you can do about it, because we didn't implement part where you can buy credits yet.");
 	});
 
-	$(".player-action-next").click(function(){
-		alplr.next();
+	
+	alplr.on_pay_success.addEventListener(function(lib){
+		show_toast(3500, "Looks cool! I took " + lib.play_cost + " credit for it. You have " + user.get_balance() + " credits.");
 	});
 
-	$(".player-action-prev").click(function(){
-		alplr.prev();
+	lib.on_results_ready.addEventListener(function(lib){
+		if(lib.results.length == 0){
+			$(".player-element-queue").show();
+			$(".player-element-search-results").hide();
+		} else {
+			$(".player-element-queue").hide();
+			$(".player-element-search-results").show();
+		}
+
+    	$(".player-element-search-results ul li").click(function(){
+        	$(".player-action-search-input").val("");
+        	$(".player-action-search-input").slideUp(100);
+			$(".player-element-queue").show();
+			$(".player-element-search-results").hide();
+    	});
 	});
 	
-	$(".player-progress").slider({
-		min: 0.0001,
-		max: 1,
-		value: 0,
-		step: 0.0001,
-		slide: function( event, ui ) {
-			alplr.set_progress(ui.value);
-		}
-    });
+	$(".player-binding-volume-status").doubletap(
+	    function(event){
+	        if ($(".player-binding-volume-status").hasClass("volume-up")){
+	        	alplr.mute();
+	        } else {
+	        	alplr.unmute();
+	        }
+	    },
+	    function(event){
+			$(".player-element-volume").slideToggle(100);
+	    }, 200);
 
-	$(".player-volume").slider({
-		min: 1,
-		max: 100,
-		value: 0,
-		step: 1,
-		slide: function( event, ui ) {
-			alplr.set_volume(Math.round(Math.log10(ui.value)*50));
-		}
-    });
-
-    alplr.on_refresh = function(instance){
-    	$(".player-volume").slider('value', Math.pow(10, (instance.volume / 50)));
-    	$(".player-audio-title").text(instance.playlist[instance.playlist_position]["Title"]);
-    	$(".player-playlist").html(get_playlist_html(instance));
-		$(".player-playlist li").on("click", function(){
-			alplr.set_position($(this).data("index"));
-		});
-    }
-
-    alplr.on_progress_refresh = function(instance){
-    	$(".player-progress").slider('value', instance.song_progress);
-    }
-
-    function get_playlist_html(instance){
-    	playlist = [];
-    	playlist.push("<ul class='playlist'>");
-		$.each(instance.playlist, function( index, value ) {
-			if (index == instance.playlist_position){
-				playlist.push("<li class='active' data-index='" + String(index) + "'>" + value["Title"] + "</li>");
-			} else {
-				playlist.push("<li data-index='" + String(index) + "'>" + value["Title"] + "</li>");
-			}
-		});
-    	playlist.push("</ul>");
-
-    	$( ".playlist" ).sortable();
-    	$( ".playlist" ).disableSelection();
-    	return playlist.join("\n");
+    function show_toast(milis, msg){
+    	$('.toast-msg').text(msg);
+    	$('.toast-msg').stop().fadeIn(200).delay(milis).fadeOut(200);
     }
 });

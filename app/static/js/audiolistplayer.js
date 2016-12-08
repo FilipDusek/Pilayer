@@ -1,150 +1,166 @@
-function AudioListPlayer(type){
-	this.playlist = [];
-	this.log = [];
-	this.playlist_position = 0;
-	this.song_progress = 0;
-	this.song_progress_real = 0;
+function AudioListPlayer(socket, user){
+	this.queue = [];
+	this.queue_position = 0;
+	this.track_progress = 0;
+	this.track_progress_real = 0;
 	this.volume = 0;
+	this.track_length = 0;
 	this.is_playing = 0;
-	this.on_refresh = undefined;
-	this.on_progress_refresh = undefined;
+	this._before_mute_volume = 100;
+	this._disable_progress_update = false;
+	this.play_cost = 0;
+	this.user = user;
+	this.album_art = "";
 
-	instance = this;
-	//asd
+    var socket = socket;
+	var _this = this;
 
-	this.refresh = function(){
-		instance = this;
-		$.ajax({
-			url: "/player/state"
-	 	}).done(function( data ) {
-	 		data = JSON.parse(data);
-			instance.volume = data["volume"];
-			instance.length = data["length"];
-			instance._song_progress_real = data["progress"];
-			instance.song_progress = data["progress"];
-			instance.is_playing = data["is_playing"];
-			instance.playlist = data["playlist"];
-			instance.playlist_position = data["playlist_position"];
-			instance._refresh_notify();
-			instance._progress_refresh_notify();
-		}).fail(function(jqXHR, textStatus){
-			instance._log(2, "get state failed (AJAX): " + textStatus)
-		});  
-	}
 
-	this.update_progress = function(update_period){
-		if (this.is_playing){
-			this.song_progress = ((this.song_progress * this.length) + update_period) / this.length
-			if (this.song_progress > 1){ //song ended, request info about new song
-				this.refresh(); 
-			} else {
-				this._progress_refresh_notify();
-			}
-		}
-	}
+	this.on_refresh = new EventHook();
+	this.on_progress_refresh = new EventHook();
+	this.on_pay_success = new EventHook();
+	this.on_pay_fail = new EventHook();
 
-	instance.refresh();
-	setInterval(function() {
-	  instance.refresh();
-	}, 2000);
-	setInterval(function() {
-	  instance.update_progress(10);
-	}, 10);
+	socket.on('event_player_init', function(msg) {
+		_this.volume = msg["volume"];
+		_this.is_muted = _this.volume == 0;
+		_this.track_length = msg["track_length"];
+		_this._track_progress_real = msg["track_progress"];
+		_this.track_progress = msg["track_progress"];
+		_this.is_playing = msg["is_playing"];
+		_this.queue = msg["queue"];
+		_this.queue_position = msg["queue_position"];
+		_this.play_cost = msg["play_cost"];
+		_this.on_refresh.fire(_this);
+		_this.on_progress_refresh.fire(_this);
+	});
 
-	this.refresh();
-
-	this._log = function(event_type, message){
-		switch(event_type){
-			case 1: 
-				this.log.push("AudioListPlayer warning: " + message);
-				console.warn(this.log[this.log.length-1])
-				break;
-			case 2: 
-				this.log.push("AudioListPlayer error: " + message);
-				console.error(this.log[this.log.length-1])
-				break;
-			default:
-				this.log.push("AudioListPlayer: " + message);
-				console.info(this.log[this.log.length-1])
+	this.fake_update_progress = function(update_period){
+		if (this.is_playing && !_this._disable_progress_update){
+			this.track_progress = ((this.track_progress * this.track_length) + update_period) / this.track_length;
+			this.on_progress_refresh.fire(_this);
 		} 
 	}
 
-	this._dump_log = function(){
-		console.log(this.log);
-	}
-
-	this._progress_refresh_notify = function(){
-		if (instance.on_progress_refresh != undefined){
-			instance.on_progress_refresh(instance);
-		}
-	}
-
-	this._refresh_notify = function(){
-		if (instance.on_refresh != undefined){
-			instance.on_refresh(instance);
-		}
-	}
-
-	this.load_playlist = function(){
-		instance = this;
-		$.ajax({
-			url: "/player/playlist/all/meta/"
-		}).done(function( data ) {
-			this.playlist = data;
-		}).fail(function(jqXHR, textStatus){
-			instance._log(2, "load playlist failed (AJAX): " + textStatus)
-		});
-	}
-
-	this._send_command = function(command, method = "GET"){
-		instance = this;
-		$.ajax({
-			method: method,
-			url: command
-		}).fail(function(jqXHR, textStatus){
-			instance._log(2, command + " failed (AJAX " + method + "): " + textStatus);
-		});
-	}
+	fake_update_period = 10;
+	setInterval(function() {
+	  _this.fake_update_progress(fake_update_period);
+	}, fake_update_period);
 
 	this.play = function(){
-		this._send_command("/player/play");
-		this.is_playing = true;
-		this._refresh_notify();
+		socket.emit('play');	
 	}
+
+	socket.on('event_play', function(msg) {
+		_this.track_progress_real = msg["progress"];
+		_this.track_progress = msg["progress"];
+		_this.is_playing = true;
+		_this.on_refresh.fire(_this);
+	});
 
 	this.pause = function(){
-		this._send_command("/player/pause");
-		this.is_playing = false;
-		this._refresh_notify();
+		socket.emit('pause');	
 	}
 
+	socket.on('event_pause', function() {
+		_this.is_playing = false;
+		_this.on_refresh.fire(_this);
+	});
+
+	socket.on('debug_message', function(msg) {
+		console.log(msg);
+	});
+
+
 	this.next = function(){
-		this._send_command("/player/next");
-		this.refresh();
+		socket.emit('next');	
 	}
 
 	this.prev = function(){
-		this._send_command("/player/prev");
-		this.refresh();
+		socket.emit('prev');
 	}
+
+	socket.on('event_track_changed', function(msg) {
+		_this.queue_position = msg["queue_position"];
+		_this.track_progress = 0;
+		_this.track_progress_real = 0;
+
+    	current_meta = _this.queue[_this.queue_position];
+    	if (!current_meta){
+    		current_meta = {};
+    		current_meta["Length"] = 0;
+    		_this.album_art = "";
+    	}
+
+		_this.track_length = current_meta["Length"];
+		_this.on_progress_refresh.fire(_this);
+		_this.on_refresh.fire(_this);
+	});
 
 	this.set_volume = function(vol){
-		this._send_command("/player/volume/" + String(vol), "PUT");
-		this.volume = vol;
-		this._refresh_notify();
+		socket.emit('volume', {"volume": vol});
 	}
 
+	this.mute = function(){
+		if (!_this.is_muted){
+			_this.set_volume(0);
+			_this._before_mute_volume = _this.volume;
+		}
+	}
+
+	this.unmute = function(){
+		if (_this.is_muted){
+			_this.set_volume(_this._before_mute_volume);
+		}
+	}
+
+	socket.on('event_volume_changed', function(msg) {
+		_this.volume = msg["volume"];
+		
+		if (_this.volume == 0){
+			_this.is_muted = true;
+		} else {
+			_this.is_muted = false;
+		}
+
+		_this.on_refresh.fire(_this);
+	});
+
 	this.set_position = function(pos){
-		this._send_command("/player/position/" + String(pos), "PUT");
-		this.playlist_position = pos;
-		this._refresh_notify();
+		socket.emit('queue_position', {"position": pos});
 	}
 
 	this.set_progress = function(prog){
-		this._send_command("/player/progress/" + String(prog), "PUT");
-		this.song_progress = prog;
-		this._refresh_notify();
+		socket.emit('track_progress', {"progress": prog});
 	}
 
-	this.load_playlist()
+	socket.on('event_progress_changed', function(msg) {
+		_this.track_progress = msg["progress"];
+		_this._track_progress_real = msg["progress"];
+		_this.on_progress_refresh.fire(_this);
+	});
+
+	socket.on('event_art_ready', function(msg) {
+		_this.album_art = msg["album_art"];
+		_this.on_refresh.fire(_this);
+	});
+
+	this.add_media = function (hash){
+		if (_this.user.pay(_this.play_cost)){
+			socket.emit("add_media", {"hash": hash});
+			_this.on_pay_success.fire(_this);
+		} else {
+			_this.on_pay_fail.fire(_this);
+		}
+	}
+
+	this.remove_media_at = function (index){
+		socket.emit("remove_media_at", {"index": index});
+	}
+
+	socket.on('event_queue_changed', function(msg) {
+		_this.queue = msg["queue"];
+		_this.queue_position = msg["queue_position"];
+		_this.on_refresh.fire(_this);
+	});
 }

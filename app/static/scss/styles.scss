@@ -1,2 +1,6 @@
-@import "modules/player";
-@import "modules/playlist";
+@import "vars";
+@import "modules/controls";
+@import "modules/queue";
+@import "modules/album_art";
+@import "modules/search";
+@import "modules/toast";

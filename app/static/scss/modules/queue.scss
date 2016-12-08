@@ -1,0 +1,40 @@
+.player-element-queue{
+	text-align: center;
+	ul{
+		text-align: left;
+		list-style-type: none;
+		padding-left: 0px;
+		li{
+			&:first-of-type{
+				border-top: 1px solid rgba(0, 0, 0, 0.5);
+			}
+			padding-left: 60px;
+			min-height: 45px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+			cursor: pointer;
+			position: relative;
+			&.active{
+				background-color: rgba(0, 0, 0, 0.03);
+				font-weight: bold;
+				&:before{
+					position: absolute;
+    				left: 25px;
+    				top: 12px;
+    				//todo: collapse when not playing
+					content: "\e072";
+					font-family: 'Glyphicons Halflings';
+				}
+			}
+			
+			.queue-song-title{
+				font-size: 16px;
+			}
+
+			.queue-song-artist{
+				font-size: 12px;
+			}
+		}
+	}
+}

@@ -1,14 +1,39 @@
-<div class="player-controls">
-  <button type="button" class="btn btn-default player-action-prev" aria-label="Left Align">
-    <span class="glyphicon glyphicon-backward glyphicon-align-left" aria-hidden="true"></span>
-  </button>
-    <button type="button" class="btn btn-default player-action-play" aria-label="Left Align">
-    <span class="glyphicon glyphicon-play glyphicon-align-left" aria-hidden="true"></span>
-  </button>
-  <button type="button" class="btn btn-default player-action-pause" aria-label="Left Align">
-    <span class="glyphicon glyphicon-pause glyphicon-align-left" aria-hidden="true"></span>
-  </button>
-  <button type="button" class="btn btn-default player-action-next" aria-label="Left Align">
-    <span class="glyphicon glyphicon-forward glyphicon-align-left" aria-hidden="true"></span>
-  </button>
+<div class="player-element-progress"></div>
+
+<div class="player-progress-info">
+  <span class="player-binding-played"></span>
+  <span class="player-binding-length"></span>
+</div>
+
+<div class="player-track-info">
+  <div class="player-track-info-main">
+    <span class="player-binding-title"></span>
+  </div>
+  <div class="player-track-info-extra">
+    <span class="player-binding-artist"></span> - <span class="player-binding-album"></span>
+  </div>
+</div>
+
+<div class="player-controls-outer">
+  <div class="player-controls-inner">
+    <button type="button" class="player-action player-action-prev" aria-label="Left Align">
+      <span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
+    </button>
+    
+    <button type="button" class="player-action player-action-toggle-play is-paused" aria-label="Left Align">
+      <span class="glyphicon" aria-hidden="true"></span>
+    </button>
+
+    <button type="button" class="player-action player-action-next" aria-label="Left Align">
+      <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+    </button>
+  </div>
+    <button type="button" class="player-action player-action-search-toggle" aria-label="Left Align">
+      <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+    </button>
+</div>
+
+<div class="player-volume-cont">
+  <div class="player-element-volume" style="display: none;"></div>
+  <span class="glyphicon player-binding-volume-status volume-up"></span>
 </div>

@@ -1,0 +1,29 @@
+$blur_rate: 35px;
+.player-art-container{
+	position: absolute;
+	width: 100%;
+	height: 100vh;
+	overflow: hidden;
+	.player-binding-art{
+		width: 100%;
+		height: $album_art_height;
+		background-position: center center;
+		background-image: url("/static/img/albumart.jpg");
+		background-size: contain;
+    	background-repeat: no-repeat;
+		&.blurred-art{
+			background-size: cover;
+			position: absolute;
+    		z-index: -1;
+    		filter: blur($blur_rate);
+    		-o-filter:blur($blur_rate);
+		    -ms-filter:blur($blur_rate);
+		    -moz-filter:blur($blur_rate);
+		    -webkit-filter:blur($blur_rate);
+		    width: 120%;
+		    height: $album_art_height+12%;
+		    margin-left: -$blur_rate*2;
+		    margin-top: -$blur_rate*2;
+		}
+	}
+}

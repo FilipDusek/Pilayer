@@ -1,0 +1,144 @@
+.player-container{
+	position: absolute;
+	top: $album_art_height;
+	width: 100%;
+	//overflow-x: hidden;
+}
+
+.player-action-toggle-play{
+	&.is-playing{
+		span:after{
+			content: "\e073";
+		}
+	}
+	&.is-paused{
+		span:after{
+			content: "\e072";
+		}
+	}
+}
+
+.player-progress-info{
+	position: relative;
+	height: 20px;
+	.player-binding-played{
+		position: absolute;
+		left: 5px;
+	}
+
+	.player-binding-length{
+		position: absolute;
+		right: 5px;
+	}
+}
+
+.player-track-info{
+	text-align: center;
+	.player-track-info-main{
+		font-weight: bold;
+		font-size: 20px;
+	}
+	.player-track-info-extra{
+		font-size: 12px;
+	}
+}
+
+.player-controls-outer{
+	text-align: center;
+	position: relative;
+	.player-controls-inner{
+		text-align: center;
+		padding-top: 20px;
+		padding-bottom: 15px;
+		width: 80%;
+		max-width: 300px;
+		position: relative;
+		display: inline-block;
+	}
+	.player-action{
+		&:focus{
+			outline: none;
+		}
+		position: relative;
+		height: 53px;
+		border: none;
+		background-color: transparent;
+		font-size: 40px;
+		&.player-action-prev, &.player-action-next{
+			font-size: 20px;
+			position: absolute;
+		}
+		&.player-action-prev{
+			left: 45px;
+		}
+		&.player-action-next{
+			right: 45px;
+		}
+		&.player-action-search-toggle{
+			position: absolute;
+    		right: 5%;
+    		top: 25%;
+    	}
+	}
+
+}
+
+.player-element-progress.ui-slider{
+	.ui-slider-range{
+		background: $ui_color_a;
+		border-radius: 0px;
+	}
+	margin-top: -$progress_height;
+	background-color: $ui_color_c;
+	border: none;
+	border-radius: 0px;
+	height: $progress_height;
+	border-right: $progress_marker_width solid transparent;
+	margin-bottom: 5px;
+	.ui-slider-handle{
+		height: 15px;
+		width: $progress_marker_width;
+		color: black;
+		border: none;
+		border-radius: 0px;
+		margin-left: 0px;
+		background-color: $ui_color_b;
+		-webkit-box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.55);
+		-moz-box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.55);
+		box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.55);
+		&:focus{
+			outline: none;
+		}
+	}
+}
+
+.player-volume-cont{
+	text-align: center;
+	padding-left: 100px;
+	padding-right: 100px;
+	.player-binding-volume-status{
+		font-size: 30px;
+		padding-bottom: 20px;
+		// color: rgba(0,0,0, 0.7);
+		&.volume-off:before{
+			content: "\e036";
+		}
+		&.volume-up:before{
+			content: "\e038";
+		}
+	}
+	.player-element-volume{
+		border: none;
+		border-radius: 0px;
+		background-color: rgba(0, 0, 0, 0.2);
+		height: 7px;
+		.ui-slider-range{
+			border-radius: 0px;
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+		margin-bottom: 25px;
+		.ui-slider-handle{
+			display: none;
+		}
+	}	
+}
