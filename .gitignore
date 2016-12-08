@@ -91,5 +91,5 @@ ENV/
 #node modules
 node_modules
 
-app/sounds
-app/static/artlib
+app/sounds/*
+app/static/artlib/*
