@@ -22,6 +22,7 @@ function AudioListPlayer(socket, user){
 	this.on_pay_fail = new EventHook();
 
 	socket.on('event_player_init', function(msg) {
+		console.log(JSON.stringify(msg));
 		_this.volume = msg["volume"];
 		_this.is_muted = _this.volume == 0;
 		_this.track_length = msg["track_length"];
@@ -146,7 +147,8 @@ function AudioListPlayer(socket, user){
 	});
 
 	this.add_media = function (hash){
-		if (_this.user.pay(_this.play_cost)){
+		user.get_role() == "admin"
+		if ((user.get_role() == "admin") ||  (_this.user.pay(_this.play_cost))){
 			socket.emit("add_media", {"hash": hash});
 			_this.on_pay_success.fire(_this);
 		} else {

@@ -4,7 +4,7 @@ function User(socket){
 	this._get_cookie = function(){
 		var cookie = Cookies.getJSON('user_auth');
 		if (!cookie){
-			var dat = {'credit': 10, 'token': '', 'role': 'admin'};
+			var dat = {'credit': 10, 'token': '', 'role': 'user'};
 			Cookies.set('user_auth', dat);
 			cookie = Cookies.getJSON('user_auth');
 		}

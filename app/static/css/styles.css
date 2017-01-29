@@ -216,10 +216,10 @@
           font-size: 12px; }
 
 .toast-msg {
-  width: 200px;
+  width: 300px;
   position: fixed;
   left: 50%;
-  margin-left: -100px;
+  margin-left: -150px;
   bottom: 10px;
   background-color: rgba(0, 0, 0, 0.65);
   color: #F0F0F0;

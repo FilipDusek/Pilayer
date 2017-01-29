@@ -1,8 +1,9 @@
-from flask import Flask, render_template, session, request, current_app, url_for
+from flask import Flask, render_template, session, request, current_app, url_for, make_response
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
 	close_room, rooms, disconnect
 from AudioListPlayer import AudioListPlayer, MediaLibrary
-import os, config, network_tools
+import os, config
+import pickle
 
 async_mode = "gevent"
 
@@ -16,10 +17,11 @@ def get_alplr():
 	if alplr is None:
 		playlist = []
 		for file in os.listdir("sounds"):
-		    if file.endswith(".mp3"):
-		        playlist.append(os.path.join("sounds", file))
 
-		alplr = current_app._alplr = AudioListPlayer(playlist, config.player_default_volume, config.player_debug, remove_after_play = config.queue_auto_remove)
+			with open("queue.pickle", "rb") as fp:   # Unpickling
+				queuepaths = pickle.load(fp)
+
+		alplr = current_app._alplr = AudioListPlayer(queuepaths, config.player_default_volume, config.player_debug, remove_after_play = config.queue_auto_remove)
 		alplr.on_end_reached += handler_end_reached
 		alplr.on_art_ready += handler_art_ready
 		alplr.on_queue_changed += handler_queue_changed
@@ -51,6 +53,13 @@ def handler_end_reached(alplr):
 		socketio.emit("event_track_changed", {"queue_position": alplr.queue_position, "length": alplr.get_length()}, broadcast = True, namespace='/test')
 
 def handler_queue_changed(alplr):
+	queuepaths = []
+	for media in alplr.queue:
+		queuepaths.append(media.media_loc)
+
+	with open("queue.pickle", "wb") as fp:
+		pickle.dump(queuepaths, fp)
+
 	socketio.emit("event_queue_changed", {"queue": alplr.get_queue_meta(), "queue_position": alplr.queue_position}, broadcast = True, namespace="/test")
 	if not alplr.is_playing:
 		socketio.emit("event_pause", broadcast = True, namespace='/test')
@@ -65,7 +74,11 @@ def audio_progress_notify(alplr):
 
 @app.route('/')
 def index():
-	return render_template('base.html', async_mode=socketio.async_mode)
+	r = make_response(render_template('base.html', async_mode=socketio.async_mode))
+	r.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+	r.headers['Pragma'] = 'no-cache'
+	return r
+	#return render_template('base.html', async_mode=socketio.async_mode)
 
 @socketio.on('search', namespace = '/test')
 def library_search(msg):

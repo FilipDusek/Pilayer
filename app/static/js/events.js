@@ -25,7 +25,11 @@ $( document ).ready(function() {
 
 	
 	alplr.on_pay_success.addEventListener(function(lib){
-		show_toast(3500, "Looks cool! I took " + lib.play_cost + " credit for it. You have " + user.get_balance() + " credits.");
+		if ((user.get_role() == "admin") || (alplr.play_cost == 0)){
+			show_toast(1000, "Looks cool!");
+		} else {
+			show_toast(3500, "Looks cool! I took " + lib.play_cost + " credits for it. You have " + user.get_balance() + " credits.");
+		}
 	});
 
 	lib.on_results_ready.addEventListener(function(lib){

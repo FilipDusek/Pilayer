@@ -12,5 +12,5 @@ player_debug = True
 
 # How many credits does user have to pay for playing song? 
 # Set 0 to disable payments
-play_cost = 1
+play_cost = 2
 

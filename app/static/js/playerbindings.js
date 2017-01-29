@@ -8,6 +8,10 @@ var alplr = new AudioListPlayer(socket, user);
 var lib = new MediaLibrary(socket);
 
 $( document ).ready(function() {
+	if (user.get_role() != "admin"){
+		$(".player-controls-inner").hide();
+	}
+
 	/* Actions */
 	$(".player-action-play").click(function(){ alplr.play(); });
 	$(".player-action-pause").click(function(){ alplr.pause(); });
@@ -83,7 +87,9 @@ $( document ).ready(function() {
 		}
 		
 		$(".player-element-queue li").on("click", function(){
-			alplr.set_position($(this).data("index"));
+			if (user.get_role() == "admin"){
+				alplr.set_position($(this).data("index"));
+			}
 		});
 
 		if (instance.album_art){
